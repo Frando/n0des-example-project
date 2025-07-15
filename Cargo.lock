@@ -1684,7 +1684,7 @@ dependencies = [
 [[package]]
 name = "iroh-n0des"
 version = "0.1.0"
-source = "git+https://github.com/n0-computer/iroh-n0des?branch=Frando%2Fsim#b0afab536e425e08fa84c2b176828bc6cea93d9c"
+source = "git+https://github.com/n0-computer/iroh-n0des?branch=Frando%2Fsim#5fcb5eac2080e433b768146ea3c823af8d82e5d2"
 dependencies = [
  "anyhow",
  "derive_more 2.0.1",
@@ -1713,7 +1713,7 @@ dependencies = [
 [[package]]
 name = "iroh-n0des-macro"
 version = "0.1.0"
-source = "git+https://github.com/n0-computer/iroh-n0des?branch=Frando%2Fsim#b0afab536e425e08fa84c2b176828bc6cea93d9c"
+source = "git+https://github.com/n0-computer/iroh-n0des?branch=Frando%2Fsim#5fcb5eac2080e433b768146ea3c823af8d82e5d2"
 dependencies = [
  "proc-macro2",
  "quote",
