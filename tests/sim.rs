@@ -40,8 +40,3 @@ async fn test_simulation() -> Result<SimulationBuilder<ExampleNode>> {
         .node_count(8);
     Ok(sim)
 }
-
-#[iroh_n0des::sim]
-async fn unimpl_simulation() -> Result<SimulationBuilder<ExampleNode>> {
-    todo!()
-}
