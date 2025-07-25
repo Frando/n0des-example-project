@@ -6,11 +6,12 @@ use iroh_n0des::simulation::{Context, Simulation, SimulationBuilder};
 async fn test_simulation() -> Result<SimulationBuilder<ExampleNode>> {
     async fn tick(ctx: &Context, node: &mut ExampleNode) -> Result<bool> {
         if ctx.node_index != 0 {
-            let target = ctx.addrs[0].clone();
-            println!(
-                "Sending message:\n\tfrom: {}\n\t to:   {}",
-                node.endpoint().node_id(),
-                target.node_id
+            let target = ctx.addr(0).unwrap().clone();
+            // record event for simulation visualization.
+            iroh_n0des::simulation::events::event(
+                node.endpoint().node_id().fmt_short(),
+                target.node_id.fmt_short(),
+                format!("send ping (round {})", ctx.round),
             );
             node.ping(target).await?;
         }
