@@ -1,37 +1,26 @@
 use anyhow::Result;
 use example_project::ExampleNode;
 use iroh_n0des::simulation::{Context, Simulation, SimulationBuilder};
+use rand::seq::IteratorRandom;
 
 #[iroh_n0des::sim]
 async fn test_simulation() -> Result<SimulationBuilder<ExampleNode>> {
     async fn tick(ctx: &Context, node: &mut ExampleNode) -> Result<bool> {
-        if ctx.node_index != 0 {
-            let target = ctx.addr(0).unwrap().clone();
-            // record event for simulation visualization.
-            iroh_n0des::simulation::events::event(
-                node.endpoint().node_id().fmt_short(),
-                target.node_id.fmt_short(),
-                format!("send ping (round {})", ctx.round),
-            );
-            node.ping(target).await?;
-        }
+        let me = ctx.self_addr().node_id;
+        let target = ctx.all_other_nodes(me).choose(&mut rand::rng()).unwrap();
+        node.ping(target.clone()).await?;
+        // record event for simulation visualization.
+        iroh_n0des::simulation::events::event(
+            node.endpoint().node_id().fmt_short(),
+            target.node_id.fmt_short(),
+            format!("send ping (round {})", ctx.round),
+        );
         Ok(true)
     }
 
     fn check(ctx: &Context, node: &ExampleNode) -> Result<()> {
         let metrics = node.ping.metrics();
-        let node_count = ctx.addrs.len() as u64;
-        println!(
-            "round {} node {}: sent {} recv {}",
-            ctx.round,
-            ctx.node_index,
-            metrics.pings_sent.get(),
-            metrics.pings_recv.get()
-        );
-        match ctx.node_index {
-            0 => assert_eq!(metrics.pings_recv.get(), (node_count - 1) * (ctx.round + 1)),
-            _ => assert_eq!(metrics.pings_sent.get(), ctx.round + 1),
-        }
+        assert_eq!(metrics.pings_sent.get(), ctx.round + 1);
         Ok(())
     }
 
