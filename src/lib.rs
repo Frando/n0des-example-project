@@ -1,11 +1,12 @@
 use anyhow::Result;
-use iroh::{Endpoint, NodeAddr, protocol::Router};
+use iroh::{Endpoint, NodeAddr, NodeId, protocol::Router};
 use iroh_n0des::{N0de, Registry};
 use iroh_ping::{ALPN as PingALPN, Ping};
 
 pub struct ExampleNode {
     pub ping: Ping,
     pub router: Router,
+    pub last_target: Option<NodeId>,
 }
 
 // needing to have this exported type is very irritating.
@@ -30,7 +31,11 @@ impl N0de for ExampleNode {
             .accept(PingALPN, ping.clone())
             .spawn();
 
-        Ok(Self { ping, router })
+        Ok(Self {
+            ping,
+            router,
+            last_target: None,
+        })
     }
 
     async fn shutdown(&mut self) -> Result<()> {
