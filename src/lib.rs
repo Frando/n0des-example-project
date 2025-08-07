@@ -1,10 +1,14 @@
+use anyhow::Result;
 use iroh::{Endpoint, NodeId, protocol::Router};
 use iroh_blobs::api::downloader::Downloader;
 use iroh_gossip::{
     api::{GossipReceiver, GossipSender},
     net::Gossip,
 };
-use iroh_n0des::Registry;
+use iroh_n0des::{
+    Registry,
+    simulation::{Node, SetupData, Spawn, SpawnContext},
+};
 use iroh_ping::Ping;
 
 #[derive(Debug)]
@@ -52,5 +56,24 @@ impl ExampleNode {
 
     pub fn node_id(&self) -> NodeId {
         self.endpoint().node_id()
+    }
+}
+
+impl Node for ExampleNode {
+    fn endpoint(&self) -> Option<&Endpoint> {
+        Some(self.endpoint())
+    }
+
+    async fn shutdown(&mut self) -> Result<()> {
+        self.router.shutdown().await?;
+        Ok(())
+    }
+}
+
+impl<T: SetupData> Spawn<T> for ExampleNode {
+    async fn spawn(ctx: &mut SpawnContext<'_, T>) -> Result<Self> {
+        let endpoint = ctx.bind_endpoint().await?;
+        let node = ExampleNode::spawn(endpoint, ctx.metrics_registry());
+        Ok(node)
     }
 }
